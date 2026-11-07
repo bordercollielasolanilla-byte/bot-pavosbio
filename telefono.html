@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PavosBio</title>
+<script src="https://telegram.org/js/telegram-web-app.js?64"></script>
+<style>body{margin:0;padding:32px 24px;font:17px/1.45 -apple-system,system-ui,Roboto,sans-serif;text-align:center;background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#222)}#b{display:none;width:100%;margin-top:20px;padding:14px;border:0;border-radius:10px;font-size:17px;background:var(--tg-theme-button-color,#2a7d46);color:var(--tg-theme-button-text-color,#fff)}</style></head>
+<body><p id="t">Un momento...</p><button id="b">☎️ Enviar mi teléfono</button>
+<script>
+(function () {
+  var w = window.Telegram && window.Telegram.WebApp;
+  var t = document.getElementById('t');
+  var b = document.getElementById('b');
+  var aviso;
+  function pedir() {
+    b.style.display = 'none';
+    t.textContent = 'Acepta cuando Telegram te pregunte.';
+    aviso = setTimeout(function () {
+      t.textContent = 'Si Telegram no te ha preguntado nada, cierra esta ventana y pulsa otra vez el botón del chat.';
+    }, 10000);
+    try {
+      w.requestContact(function (ok) {
+        clearTimeout(aviso);
+        if (ok) {
+          t.textContent = '¡Gracias! Ya puedes volver al chat.';
+          setTimeout(function () { w.close(); }, 500);
+        } else {
+          t.textContent = 'No pasa nada. Sin tu teléfono no puedo encontrar tus pedidos. Si cambias de idea, pulsa aquí:';
+          b.style.display = 'block';
+        }
+      });
+    } catch (e) {
+      clearTimeout(aviso);
+      t.textContent = 'Cierra esta ventana y pulsa otra vez el botón del chat, por favor.';
+    }
+  }
+  if (!w || !w.initData) { t.textContent = 'Esta página solo funciona dentro de Telegram.'; return; }
+  w.ready();
+  if (!w.isVersionAtLeast('6.9')) { t.textContent = 'Tu Telegram es antiguo y no me deja pedirte el teléfono. Actualízalo, por favor, y vuelve a probar.'; return; }
+  b.onclick = pedir;
+  pedir();
+})();
+</script></body></html>
